@@ -68,7 +68,7 @@ func Configure(c Config) (*slog.Logger, error) {
 			return slog.String(slog.TimeKey, t.Format(cfg.TimeFormat))
 		}
 		if a.Key == slog.SourceKey {
-			const skip = 9
+			const skip = 7
 			pc, file, line, ok := runtime.Caller(skip)
 			if ok {
 				src := slog.Source{
