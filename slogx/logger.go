@@ -69,7 +69,7 @@ func Configure(c Config) (*slog.Logger, error) {
 		if cfg.ShortSource && a.Key == slog.SourceKey {
 			if src, ok := a.Value.Any().(slog.Source); ok {
 				src.File = filepath.Base(src.File)
-				return slog.Any(slog.SourceKey, src)
+				a.Value = slog.AnyValue(src)
 			}
 		}
 		if cfg.ReplaceAttr != nil {
