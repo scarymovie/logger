@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -66,10 +67,19 @@ func Configure(c Config) (*slog.Logger, error) {
 			}
 			return slog.String(slog.TimeKey, t.Format(cfg.TimeFormat))
 		}
-		if cfg.ShortSource && a.Key == slog.SourceKey {
-			if src, ok := a.Value.Any().(slog.Source); ok {
-				src.File = filepath.Base(src.File)
-				a.Value = slog.AnyValue(src)
+		if a.Key == slog.SourceKey {
+			const skip = 4
+			pc, file, line, ok := runtime.Caller(skip)
+			if ok {
+				src := slog.Source{
+					Function: runtime.FuncForPC(pc).Name(),
+					File:     file,
+					Line:     line,
+				}
+				if cfg.ShortSource {
+					src.File = filepath.Base(src.File)
+				}
+				return slog.Any(slog.SourceKey, src)
 			}
 		}
 		if cfg.ReplaceAttr != nil {
